@@ -1,13 +1,9 @@
-"""Module providing a Custom User."""
-
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 class CustomUserManager(BaseUserManager):
-    """Class representing a Custiom User Manager."""
 
     def create_user(self, email, name, gender, password=None):
-        """Function creating user."""
 
         if not email:
             raise ValueError('Users must have an email address')
@@ -23,7 +19,6 @@ class CustomUserManager(BaseUserManager):
         return user
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    """Class representing a Custom User model."""
 
     GENDER_CHOICES = (
         ('M', 'Male'),
