@@ -44,7 +44,6 @@ class AttendanceActionSerializer(serializers.Serializer):
         user = self.context['request'].user
         try:
             event.add_attendee(user)
-            return {"message": "Successfully registered for the event"}
         except ValidationError as e:
             raise serializers.ValidationError({
                 "error": str(e.message)
@@ -55,7 +54,6 @@ class AttendanceActionSerializer(serializers.Serializer):
         user = self.context['request'].user
         try:
             event.remove_attendee(user)
-            return {"message": "Successfully unregistered from the event"}
         except ValidationError as e:
             raise serializers.ValidationError({
                 "error": str(e.message)

@@ -29,8 +29,10 @@ class AttendEventView(generics.GenericAPIView):
             context={'request': request, 'event': event, 'action': 'attend'}
         )
         serializer.is_valid(raise_exception=True)
+        serializer.attend()
+
         return Response(
-            getattr(serializer, 'attend')(),
+            {"message": "Successfully registered for the event"},
             status=status.HTTP_200_OK
         )
 
@@ -46,7 +48,9 @@ class UnattendEventView(generics.GenericAPIView):
             context={'request': request, 'event': event, 'action': 'unattend'}
         )
         serializer.is_valid(raise_exception=True)
+        serializer.unattend()
+
         return Response(
-            getattr(serializer, 'unattend')(),
+            {"message": "Successfully unregistered from the event"},
             status=status.HTTP_200_OK
         )
