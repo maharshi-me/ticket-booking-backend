@@ -22,20 +22,6 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, name, gender, password=None):
-        """Function creating superuser."""
-
-        user = self.create_user(
-            email=email,
-            password=password,
-            name=name,
-            gender=gender,
-        )
-        user.is_staff = True
-        user.is_superuser = True
-        user.save(using=self._db)
-        return user
-
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     """Class representing a Custom User model."""
 
@@ -47,8 +33,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 

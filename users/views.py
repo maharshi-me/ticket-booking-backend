@@ -3,10 +3,10 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout
-from .serializers import UserSerializer, LoginSerializer
+from .serializers import RegisterSerializer, LoginSerializer, UserResponseSerializer
 
 class RegisterView(generics.CreateAPIView):
-    serializer_class = UserSerializer
+    serializer_class = RegisterSerializer
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
@@ -15,7 +15,7 @@ class RegisterView(generics.CreateAPIView):
             user = serializer.save()
             return Response({
                 "message": "User created successfully",
-                "user": UserSerializer(user).data
+                "user": UserResponseSerializer(user).data
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -34,10 +34,7 @@ class LoginView(generics.GenericAPIView):
                 login(request, user)
                 return Response({
                     "message": "Login successful",
-                    "user": {
-                        "email": user.email,
-                        "name": user.name
-                    }
+                    "user": UserResponseSerializer(user).data
                 })
             return Response({
                 "message": "Invalid credentials"
