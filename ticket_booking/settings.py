@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'users',
+    'events'
 ]
 
 MIDDLEWARE = [
@@ -138,7 +139,6 @@ AUTHENTICATION_BACKENDS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
@@ -150,7 +150,7 @@ REST_FRAMEWORK = {
 }
 
 # Configure session settings
-SESSION_COOKIE_SECURE = True  # for HTTPS
+SESSION_COOKIE_SECURE = False  # for HTTPS
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 

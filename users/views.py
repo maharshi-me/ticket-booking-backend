@@ -1,8 +1,8 @@
-from rest_framework import generics
-from rest_framework.permissions import AllowAny
+from rest_framework import generics, status
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from .serializers import UserSerializer, LoginSerializer
 
 class RegisterView(generics.CreateAPIView):
@@ -43,3 +43,13 @@ class LoginView(generics.GenericAPIView):
                 "message": "Invalid credentials"
             }, status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LogoutView(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        logout(request)
+        return Response({
+            "message": "Successfully logged out"
+        }, status=status.HTTP_200_OK)
+
