@@ -2,7 +2,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Event
-from .serializers import EventSerializer, EventAttendanceSerializer
+from .serializers import EventSerializer, AttendanceActionSerializer
 
 class EventListView(generics.ListAPIView):
     """List all events."""
@@ -19,7 +19,7 @@ class EventDetailView(generics.RetrieveAPIView):
 
 class AttendEventView(generics.GenericAPIView):
     queryset = Event.objects.all()
-    serializer_class = EventAttendanceSerializer
+    serializer_class = AttendanceActionSerializer
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
@@ -36,7 +36,7 @@ class AttendEventView(generics.GenericAPIView):
 
 class UnattendEventView(generics.GenericAPIView):
     queryset = Event.objects.all()
-    serializer_class = EventAttendanceSerializer
+    serializer_class = AttendanceActionSerializer
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):

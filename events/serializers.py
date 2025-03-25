@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Event
+from .models import Event, EventAttendance
 from django.core.exceptions import ValidationError
 
 class UserSerializer(serializers.ModelSerializer):
@@ -8,20 +8,36 @@ class UserSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = ['id', 'email', 'name']
 
+class EventAttendanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventAttendance
+        fields = ['fee_paid', 'registered_at']
+
 class EventSerializer(serializers.ModelSerializer):
     attendees = UserSerializer(many=True, read_only=True)
     is_attending = serializers.SerializerMethodField()
+    my_attendance = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
-        fields = '__all__'
+        fields = ['id', 'name', 'description', 'date', 'fee',
+                 'attendees', 'is_attending', 'my_attendance']
 
     def get_is_attending(self, obj):
         user = self.context['request'].user
-        return user in obj.attendees.all() if user.is_authenticated else False
+        return obj.eventattendance_set.filter(user=user).exists()
 
-class EventAttendanceSerializer(serializers.Serializer):
-    message = serializers.CharField(read_only=True)
+    def get_my_attendance(self, obj):
+        user = self.context['request'].user
+        if not user.is_authenticated:
+            return None
+        try:
+            attendance = obj.eventattendance_set.get(user=user)
+            return EventAttendanceSerializer(attendance).data
+        except EventAttendance.DoesNotExist:
+            return None
+
+class AttendanceActionSerializer(serializers.Serializer):
 
     def attend(self):
         event = self.context['event']
