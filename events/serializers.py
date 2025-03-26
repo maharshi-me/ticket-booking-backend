@@ -11,17 +11,18 @@ class MyAttendanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventAttendance
         fields = ['fee_paid', 'registered_at']
-        read_only_fields = ['fee_paid', 'registered_at']
+        read_only_fields = fields
 
 class EventSerializer(serializers.ModelSerializer):
     attendees = UserSerializer(many=True, read_only=True)
     is_attending = serializers.SerializerMethodField()
     my_attendance = serializers.SerializerMethodField()
-
+    discounted_fee = serializers.SerializerMethodField()
     class Meta:
         model = Event
-        fields = ['id', 'name', 'description', 'date', 'fee',
+        fields = ['id', 'name', 'description', 'date', 'fee', 'discounted_fee',
                  'attendees', 'is_attending', 'my_attendance']
+        read_only_fields = fields
 
     def get_is_attending(self, obj):
         user = self.context['request'].user
@@ -36,6 +37,13 @@ class EventSerializer(serializers.ModelSerializer):
             return MyAttendanceSerializer(attendance).data
         except EventAttendance.DoesNotExist:
             return None
+
+    def get_discounted_fee(self, obj):
+        user = self.context.get('request').user
+        if not user.is_authenticated:
+            return obj.fee
+        return obj.get_fee_for_user(user)
+
 
 class SimpleEventSerializer(serializers.ModelSerializer):
     class Meta:
