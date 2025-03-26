@@ -1,17 +1,17 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import Event, EventAttendance
-from django.core.exceptions import ValidationError
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['id', 'email', 'name']
 
-class EventAttendanceSerializer(serializers.ModelSerializer):
+class MyAttendanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventAttendance
         fields = ['fee_paid', 'registered_at']
+        read_only_fields = ['fee_paid', 'registered_at']
 
 class EventSerializer(serializers.ModelSerializer):
     attendees = UserSerializer(many=True, read_only=True)
@@ -33,28 +33,20 @@ class EventSerializer(serializers.ModelSerializer):
             return None
         try:
             attendance = obj.eventattendance_set.get(user=user)
-            return EventAttendanceSerializer(attendance).data
+            return MyAttendanceSerializer(attendance).data
         except EventAttendance.DoesNotExist:
             return None
 
-class AttendanceActionSerializer(serializers.Serializer):
+class SimpleEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ['id', 'name']
 
-    def attend(self):
-        event = self.context['event']
-        user = self.context['request'].user
-        try:
-            event.add_attendee(user)
-        except ValidationError as e:
-            raise serializers.ValidationError({
-                "error": str(e.message)
-            })
+class EventAttendanceSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    event = SimpleEventSerializer(read_only=True)
 
-    def unattend(self):
-        event = self.context['event']
-        user = self.context['request'].user
-        try:
-            event.remove_attendee(user)
-        except ValidationError as e:
-            raise serializers.ValidationError({
-                "error": str(e.message)
-            })
+    class Meta:
+        model = EventAttendance
+        fields = ['fee_paid', 'registered_at', 'event', 'user']
+        read_only_fields = ['fee_paid', 'registered_at', 'event', 'user']

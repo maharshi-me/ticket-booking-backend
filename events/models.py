@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 from decimal import Decimal
 
+User = get_user_model()
 class Event(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
@@ -17,7 +18,7 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     attendees = models.ManyToManyField(
-        get_user_model(),
+        User,
         through='EventAttendance',
         related_name='events_attending',
         blank=True
@@ -41,6 +42,11 @@ class Event(models.Model):
         now = timezone.localtime(timezone.now())
         return event_date < now
 
+    def get_fee_for_user(self, user):
+        if user.gender == 'F':
+            return self.fee * Decimal('0.95')
+        return self.fee
+
     def add_attendee(self, user):
         if self.is_past:
             raise ValidationError("Cannot attend past events")
@@ -48,11 +54,13 @@ class Event(models.Model):
         if self.eventattendance_set.filter(user=user).exists():
             raise ValidationError("User is already attending this event")
 
-        EventAttendance.objects.create(
+        attendance = EventAttendance.objects.create(
             event=self,
             user=user,
-            fee_paid=self.fee
+            fee_paid=self.get_fee_for_user(user)
         )
+
+        return attendance
 
     def remove_attendee(self, user):
         attendance = self.eventattendance_set.filter(user=user).first()
@@ -62,7 +70,7 @@ class Event(models.Model):
 
 class EventAttendance(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     fee_paid = models.DecimalField(
         max_digits=10,
         decimal_places=2,
