@@ -42,7 +42,7 @@ class EventSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if not user.is_authenticated:
             return obj.fee
-        return obj.get_fee_for_user(user)
+        return str(obj.get_fee_for_user(user))
 
 
 class SimpleEventSerializer(serializers.ModelSerializer):

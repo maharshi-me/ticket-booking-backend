@@ -43,7 +43,7 @@ class Event(models.Model):
 
     def get_fee_for_user(self, user):
         if user.gender == 'F':
-            return self.fee * Decimal('0.95')
+            return round(self.fee * Decimal('0.95'), 2)
         return self.fee
 
     def add_attendee(self, user):
