@@ -5,7 +5,6 @@ from events.models import Event, EventAttendance
 from decimal import Decimal
 import random
 from datetime import datetime, timedelta
-import pytz
 
 class Command(BaseCommand):
     help = 'Seed database with sample data'
@@ -77,9 +76,21 @@ class Command(BaseCommand):
             for user in attendees:
                 event.add_attendee(user)
 
+        past_date = timezone.make_aware(datetime(2020, 1, 1, 0, 0))
+
+        Event.objects.create(
+            name='Past Event',
+            description='This event has already passed.',
+            date=past_date,
+            fee=Decimal('0.00')
+        )
+
         self.stdout.write(self.style.SUCCESS(f'''
-Successfully seeded database with:
-- {len(users)} users
-- {len(events)} events
-- {EventAttendance.objects.count()} attendances
+            Successfully seeded database with:
+                - {len(users)} users user1@example.com through user5@example.com
+                - All passwords are 'testpass123'
+                - Alternating gender (M/F)
+                - {len(events)} events
+                - {EventAttendance.objects.count()} attendances
+                - 1 Past Event
         '''))

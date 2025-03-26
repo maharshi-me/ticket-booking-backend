@@ -63,6 +63,8 @@ class Event(models.Model):
 
     def remove_attendee(self, user):
         attendance = self.eventattendance_set.filter(user=user).first()
+        if self.is_past:
+            raise ValidationError("Cannot unattend from past events")
         if not attendance:
             raise ValidationError("User is not attending this event")
         attendance.delete()

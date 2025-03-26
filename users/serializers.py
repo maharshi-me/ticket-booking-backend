@@ -33,4 +33,4 @@ class UserResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'name', 'email', 'gender')
-        read_only = True
+        read_only_fields = fields

@@ -6,6 +6,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['id', 'email', 'name']
+        read_only_fields = fields
 
 class MyAttendanceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -49,6 +50,7 @@ class SimpleEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ['id', 'name']
+        read_only_fields = fields
 
 class EventAttendanceSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -57,4 +59,4 @@ class EventAttendanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventAttendance
         fields = ['fee_paid', 'registered_at', 'event', 'user']
-        read_only_fields = ['fee_paid', 'registered_at', 'event', 'user']
+        read_only_fields = fields
