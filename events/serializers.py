@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import Event, EventAttendance
+from django.urls import reverse
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,10 +20,12 @@ class EventSerializer(serializers.ModelSerializer):
     is_attending = serializers.SerializerMethodField()
     my_attendance = serializers.SerializerMethodField()
     discounted_fee = serializers.SerializerMethodField()
+    absolute_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Event
         fields = ['id', 'name', 'description', 'date', 'fee', 'discounted_fee',
-                 'attendees', 'is_attending', 'my_attendance']
+                 'attendees', 'is_attending', 'my_attendance', 'absolute_url']
         read_only_fields = fields
 
     def get_is_attending(self, obj):
@@ -45,6 +48,10 @@ class EventSerializer(serializers.ModelSerializer):
             return obj.fee
         return str(obj.get_fee_for_user(user))
 
+    def get_absolute_url(self, obj):
+        return self.context.get('request').build_absolute_uri(
+            reverse('events:event-detail', kwargs={'pk': obj.pk})
+        )
 
 class SimpleEventSerializer(serializers.ModelSerializer):
     class Meta:
