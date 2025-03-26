@@ -18,7 +18,7 @@ A Django REST API for event ticket booking with user authentication and gender-b
 python -m venv env
 
 # Activate on Windows
-source env\Scripts\activate
+env\Scripts\activate
 
 # Activate on Unix/MacOS
 source env/bin/activate
